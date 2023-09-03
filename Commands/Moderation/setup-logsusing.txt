@@ -1,0 +1,52 @@
+const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ChannelType } = require("discord.js");
+
+const logSchema = require("../../Models/Logs");
+
+module.exports = {
+    data: new SlashCommandBuilder()
+        .setName("setup-logs")
+        .setDescription("Set up your logging channel for the audit logs.")
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
+        .addChannelOption(option =>
+            option.setName("channel") // Set the name of the option to "channel"
+                .setDescription("Select the channel that you want to receive the logging messages.")
+                .setRequired(true)
+        ),
+    async execute(interaction) {
+        const { channel, options, guildId } = interaction;
+
+        const logChannel = options.getChannel("channel") || interaction.channel;
+        const embed = new EmbedBuilder();
+
+        logSchema.findOne({ guild: guildId }, async (err, data) => {
+            if (!data) {
+                await logSchema.create({
+                    Guild: guildId,
+                    Channel: logChannel.id,
+                });
+
+                embed.setDescription("Data was successfully sent to the database.")
+                    .setColor("Green")
+                    .setTimestamp();
+            } else if (data) {
+                logSchema.findOneAndDelete({ Guild: guildId });
+                await logSchema.create({
+                    Guild: guildId,
+                    Channel: logChannel.id,
+                });
+
+                embed.setDescription("Old data was successfully replaced with the new data.")
+                    .setColor("Green")
+                    .setTimestamp();
+            }
+
+            if (err) {
+                embed.setDescription("Something went wrong. Please contact 121afaswpos (bot developer).")
+                    .setColor("Red")
+                    .setTimestamp();
+            }
+
+            return interaction.reply({ embeds: [embed], ephemeral: true });
+        });
+    }
+}

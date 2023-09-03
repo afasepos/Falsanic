@@ -1,8 +1,8 @@
-const { model, Schema } = require("mongoose");
+const {model, Schema} = require('mongoose');
 
 let logSchema = new Schema({
-    Guild: String,
-    Channel: String,
+  GuildId: String,
+  ChannelId: String,
 });
 
-module.exports = model("Logs", logSchema);
+module.exports = model('Logs', logSchema);

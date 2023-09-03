@@ -1,52 +1,55 @@
-const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, ChannelType } = require("discord.js");
-
-const logSchema = require("../../Models/Logs");
+const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits, ChannelType } = require('discord.js');
+const logSchema = require("../../Models/Logs.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName("setup-logs")
-        .setDescription("Set up your logging channel for the audit logs.")
+        .setName('setup-logs')
+        .setDescription('Set up logging channel')
+        .setDMPermission(false)
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .addChannelOption(option =>
-            option.setName("channel") // Set the name of the option to "channel"
-                .setDescription("Select the channel that you want to receive the logging messages.")
-                .setRequired(true)
+            option.setName('channel')
+            .setDescription('channel for logs')
+            .addChannelTypes(ChannelType.GuildText)
+            .setRequired(false)
         ),
-    async execute(interaction) {
-        const { channel, options, guildId } = interaction;
 
-        const logChannel = options.getChannel("channel") || interaction.channel;
-        const embed = new EmbedBuilder();
+        async execute(interaction) {
+            const {channel, guildId, options} = interaction;
 
-        logSchema.findOne({ guild: guildId }, async (err, data) => {
-            if (!data) {
-                await logSchema.create({
-                    Guild: guildId,
-                    Channel: logChannel.id,
-                });
+            const logChannel = options.getChannel('channel') || channel;
+            const embed = new EmbedBuilder();
 
-                embed.setDescription("Data was successfully sent to the database.")
-                    .setColor("Green")
+            try {
+                const data = logSchema.findOne({ GuildID: guildId});
+                if (!data) {
+                    await logSchema.create({
+                        GuildId: guildId,
+                        ChannelId: logChannel.id,
+                    });
+
+                    embed.setDescription('Setup the log channel.')
+                    .setColor('Green')
                     .setTimestamp();
-            } else if (data) {
-                logSchema.findOneAndDelete({ Guild: guildId });
-                await logSchema.create({
-                    Guild: guildId,
-                    Channel: logChannel.id,
-                });
+                } else if (data) {
+                    await logSchema.findOneAndDelete({GuildId: guildId})
+                    await logSchema.create({
+                        GuildId: guildId,
+                        ChannelId: logChannel.id,
+                    });
 
-                embed.setDescription("Old data was successfully replaced with the new data.")
-                    .setColor("Green")
+                    embed.setDescription('The log channel was successfully setupped.')
+                    .setColor('Green')
                     .setTimestamp();
+                }
+            } catch (error) {
+                embed.setDescription('Something went wrong. Please contact the bot developer.')
+                .setColor('Red')
+                .setTimestamp();
+                console.log(error)
             }
 
-            if (err) {
-                embed.setDescription("Something went wrong. Please contact 121afaswpos (bot developer).")
-                    .setColor("Red")
-                    .setTimestamp();
-            }
-
-            return interaction.reply({ embeds: [embed], ephemeral: true });
-        });
-    }
+            return interaction.reply({embeds: [embed], ephemeral: true})
+            
+        }
 }

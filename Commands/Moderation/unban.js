@@ -12,7 +12,7 @@ module.exports = {
         ),
     
     async execute(interaction) {
-        const { options } = interaction;
+        const { options, guild } = interaction;
 
         const user = options.getUser("userid");
 
@@ -20,7 +20,7 @@ module.exports = {
             await interaction.guild.members.unban(user);
 
             const embed = new EmbedBuilder()
-                .setDescription(`Successfully unbanned user ${user.tag} from the guild.`)
+                .setDescription(`Successfully unbanned user ${user.tag} from the ${guild.name} server.`)
                 .setColor(0x5fb041)
                 .setTimestamp();
 

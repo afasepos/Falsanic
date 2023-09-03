@@ -1,10 +1,4 @@
-const { 
-Client,
-GatewayIntentBits,
-Partials,
-Collection,
-ActivityType
-} = require("discord.js");
+const { Client, SlashCommandBuilder, EmbedBuilder, ChannelType, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, Events, GatewayIntentBits, Partials, Collection, ActivityType } = require("discord.js");
 const YoutubePoster = require("discord-youtube");
 const logs = require("discord-logs");
 const express = require("express");
@@ -62,6 +56,37 @@ client.on('ready', (client) => {
     client.user.setActivity(status[random]);
   }, 4000); //refresh 4 seconds
 });
+
+client.on(Events.InteractionCreate, async (interaction) => {
+ 
+  const channelID = '1147876212815974400';
+
+  if (!interaction.isModalSubmit()) return;
+
+  if (interaction.customId === "modal") {
+    const name = interaction.fields.getTextInputValue("name");
+    const mark = interaction.fields.getTextInputValue("mark");
+    const feedbackfeeling = interaction.fields.getTextInputValue("feedbackfeeling");
+    const problem = interaction.fields.getTextInputValue("problem");
+
+
+    const id = interaction.user.id;
+    const tag = interaction.user.tag;
+
+    const embed = new EmbedBuilder()
+      .setColor('#FFDEDE')
+      .setTitle(`New Feedback from ${tag} (${id})`)
+      .setDescription(`**User Name:**\n\`${name}\`\n**Out of 10, how many you will give to Falsanic:** \n \`${mark}\`\n**Provide us what do you think about Falsanic**\n \`${feedbackfeeling}\`\n**Problem when using Falsanic**\n\`${problem}\``)
+
+        const channel = interaction.guild.channels.cache.get(channelID);
+
+        channel.send({ embeds: [embed] });
+
+        await interaction.reply({
+          content: `You've successfully reported a user, bug or something else.`, ephemeral: true,
+        });
+      }
+    });
 
 module.exports = client;
 
