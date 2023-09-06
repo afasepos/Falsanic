@@ -4,7 +4,7 @@ const warningSchema = require("../../Models/Warning.js");
 module.exports ={
     data: new SlashCommandBuilder()
         .setName("warnings")
-        .setDescription("Fully complete warn system")
+        .setDescription("Fully complete warnings system.")
         .setDefaultMemberPermissions(PermissionFlagsBits.KickMembers)
         .addSubcommand(subcommand => 
             subcommand.setName("add")
@@ -27,7 +27,7 @@ module.exports ={
         )
         .addSubcommand(subcommand => 
             subcommand.setName("check")
-                .setDescription("check warnings of a user.")
+                .setDescription("Check the current warnings of a user.")
                 .addUserOption(option => 
                     option.setName("target")
                         .setDescription("Select a user.")

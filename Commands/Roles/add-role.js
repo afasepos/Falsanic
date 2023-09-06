@@ -1,39 +1,38 @@
 const rrSchema = require("../../Models/ReactionRoles");
-const {SlashCommandBuilder, PermissionFlagsBits} = require("discord.js");
+const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
-    .setName("addrole")
-    .setDescription("Add custom reaction role.")
-    .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)
-    .addRoleOption(option =>
-        option.setName("role")
-            .setDescription("Select the role to be assigned.")
-            .setRequired(true)
-    )
-    .addStringOption(option =>
-        option.setName("description")
-            .setDescription("Description of the role.")
-            .setRequired(false)
-    )
-    .addStringOption(option =>
-        option.setName("emoji")
-            .setDescription("Emoji for the role.")
-            .setRequired(false)
-    ),
+        .setName("addrole")
+        .setDescription("Add custom reaction role.")
+        .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)
+        .addRoleOption(option =>
+            option.setName("role")
+                .setDescription("Select the role to be assigned.")
+                .setRequired(true)
+        )
+        .addStringOption(option =>
+            option.setName("description")
+                .setDescription("Description of the role.")
+                .setRequired(false)
+        )
+        .addStringOption(option =>
+            option.setName("emoji")
+                .setDescription("Emoji for the role.")
+                .setRequired(false)
+        ),
     async execute(interaction) {
-        const {options, guildId, member} = interaction;
+        const { options, guildId, member } = interaction;
 
         const role = options.getRole("role");
-        const description = options.getRole("description");
-        const emoji = options.getRole("emoji");
+        const description = options.getString("description"); // Change to getString
+        const emoji = options.getString("emoji"); // Change to getString
 
         try {
-
             if (role.position >= member.roles.highest.position)
                 return interaction.reply({ content: "I don't have permissions for that.", ephemeral: true });
-            
-                const data = await rrSchema.findOne({ GuildID: guildId});
+
+            const data = await rrSchema.findOne({ GuildID: guildId });
 
             const newRole = {
                 roleId: role.id,
@@ -58,10 +57,10 @@ module.exports = {
                 });
             }
 
-            return interaction.reply({ content: `Created new role **${role.name}**` });
+            return interaction.reply({ content: `Created new role **${role.name}.**` });
 
         } catch (err) {
             console.log(err);
         }
-    } 
+    }
 }

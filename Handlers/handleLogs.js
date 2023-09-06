@@ -127,7 +127,7 @@ function handleLogs(client) {
     
           const embed = new EmbedBuilder()
           .setColor('Red')
-          .setAuthor({name: `${message.member.user.tag}`, iconURL: message.member.displayAvatarURL()})
+          .setAuthor({name: `${message.author.tag}`, iconURL: message.member.displayAvatarURL()})
           .setDescription(`**Message sent by **<@${message.member.user.id}> **Deleted in** <#${message.channel.id}>\n${mes}`)
           .setImage(message.attachments.first()?.url || null)
           .setTimestamp()

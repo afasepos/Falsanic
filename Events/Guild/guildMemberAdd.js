@@ -1,46 +1,41 @@
-const { MessageEmbed } = require("discord.js");
-const Schema = require("../../Models/Welcome.js");
+const { EmbedBuilder } = require("discord.js");
+const welcomeSchema = require("../../Models/Welcome.js");
+
+const welcomeMessages = [
+    `Welcome to the server`,
+    `Hey there, welcome`,
+    `Howdy, glad you're here`,
+]
 
 module.exports = {
-  name: "guildMemberAdd",
-  async execute(member) {
-    Schema.findOne({ Guild: member.guild.id }, async (err, data) => {
-      if (err) {
-        console.log(`Error fetching welcome data: ${err}`);
-        return;
-      }
-      if (!data) return;
+    name: 'guildMemberAdd',
+    async execute(member) {
+        const guildId = member.guild.id;
 
-      try {
-        const welcomeChannel = await member.guild.channels.fetch(data.Channel);
-        if (!welcomeChannel) {
-          console.log('Welcome channel not found or invalid.');
-          return;
-        }
+        welcomeSchema.findOne({ Guild: guildId }, (err, data) => {
+            if (data) {
+                const channelId = data.Channel;
+                const channel = member.guild.channels.cache.get(channelId);
 
-        const welcomeEmbed = new MessageEmbed()
-          .setTitle("**New member!**")
-          .setDescription(data.Msg)
-          .setColor(0x037821)
-          .addFields({ name: 'Total Members', value: `${member.guild.memberCount}` })
-          .setTimestamp();
+                if (channel) {
+                    const memberUsername = member.user.username;
+                    const memberThumbnail = member.user.displayAvatarURL({ size: 256 });
 
-        try {
-          await welcomeChannel.send({ embeds: [welcomeEmbed] });
-          console.log(`Welcome message sent in channel: ${welcomeChannel.name}`);
-        } catch (error) {
-          console.log(`Error sending welcome message: ${error}`);
-        }
+                    const randomMessageIndex = Math.floor(Math.random() * welcomeMessages.length);
+                    const randomMessage = welcomeMessages[randomMessageIndex];
 
-        if (data.Role) {
-          const role = member.guild.roles.cache.get(data.Role);
-          if (role) {
-            member.roles.add(role);
-          }
-        }
-      } catch (error) {
-        console.log(`Error fetching welcome channel: ${error}`);
-      }
-    });
-  }
+                    const userEmbed = new EmbedBuilder()
+                        .setTitle(`${memberUsername}`)
+                        .setDescription(`${randomMessage}\n\n» | Read the https://discord.com/channels/1069235053000933486/1069235889542287502\n» | Read the Announcements https://discord.com/channels/1069235053000933486/1069235803089281134\n» | Order Here https://discord.com/channels/1069235053000933486/1108699046656352387`)
+                        .setImage(memberThumbnail)
+                        .setTimestamp()
+                        .setFooter({ text: "Welcome to our Discord server. We are so excited to have you join us."})
+
+                    channel.send({
+                        embeds: [userEmbed]
+                    });
+                }
+            }
+        });
+    },
 };

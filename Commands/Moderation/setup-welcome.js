@@ -1,49 +1,43 @@
-const { EmbedBuilder, Client, SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
-const welcomeSchema = require("../../Models/Welcome");
-const {model, Schema} = require("mongoose");
+const { SlashCommandBuilder, PermissionFlagsBits, ChannelType } = require('discord.js');
+const welcomeSchema = require('../../Models/Welcome.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-    .setName("setup-welcome")
-    .setDescription("Set up your welcome message for the discord bot.")
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-    .addChannelOption(option => 
-         option.setName("channel")
-         .setDescription("Channel for welcome messages.")
-         .setRequired(true)
-    )
-    .addStringOption(option =>
-        option.setName("welcome-message")
-        .setDescription("Enter your welcome message!")
-        .setRequired(true)
-    ) 
-    .addRoleOption(option =>    
-        option.setName("welcome-role")
-        .setDescription("Enter your welcome role.")
-        .setRequired(true)
-    ),   
-
+        .setName('welcome-setup')
+        .setDescription("Setup a welcome message for your Discord server.")
+        .setDMPermission(false)
+        .addChannelOption(option => option
+            .setName('channel')
+            .setDescription("Please indicate the channel where you would like the welcome messages to be sent.")
+            .setRequired(true)
+            .addChannelTypes(ChannelType.GuildText, ChannelType.GuildAnnouncement)
+        ),
     async execute(interaction) {
-        const {channel, options} = interaction;
 
-        const welcomeChannel = options.getChannel("channel");
-        const welcomeMessage = options.getString("welcome-message");
-        const roleId = options.getRole("welcome-role");
+        if(!interaction.member.permissions.has(PermissionFlagsBits.ManageChannels)) return await interaction.reply({ content: "The welcome system cannot be set up because you do not have the necessary permissions to do so.", ephemeral: true })
 
-        if(!interaction.guild.members.me.permissions.has(PermissionFlagsBits.SendMessages)) {
-            interaction.reply({content: "I don't have permissions to send messages in that channel.", ephemeral: true});
-        }
+        const channel = interaction.options.getChannel('channel')
 
-        welcomeSchema.findOne({Guild: interaction.guild.id}, async (err, data) => {
-            if(!data) {
-                const newWelcome = await welcomeSchema.create({
+        welcomeSchema.findOne({ Guild: interaction.guild.id }, async (err, data) => {
+
+            if (!data) {
+                welcomeSchema.create({
                     Guild: interaction.guild.id,
-                    Welcome: welcomeChannel.id,
-                    Msg: welcomeMessage,
-                    Role: roleId.id,
+                    Channel: channel.id,
                 });
-            }
-            interaction.reply({content: 'Successfully created a welcome message.', ephemeral: true});
+            } else {
+                await interaction.reply({
+                    content: 'You have a welcome message system in place. To restart it, use the `/welcome-disable` command.',
+                    ephemeral: true
+                });
+                return;
+            }   
+
+            // Auth System Setup Message
+            await interaction.reply({
+                content: `The welcome message system has been successfully implemented within the ${channel}.`,
+                ephemeral: true
+            })
         })
     }
-};
+}
