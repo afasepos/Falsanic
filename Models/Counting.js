@@ -1,10 +1,10 @@
-const { model, Schema } = require("mongoose");
+const { model, Schema } = require('mongoose');
 
 let countingSchema = new Schema({
-    GuildID: String,
+    Guild: String,
     Channel: String,
     Count: Number,
-    LastPerson: String,
-})
+    MaxCount: Number
+});
 
-module.exports = model("Counting", countingSchema)
+module.exports = model('countingSchema', countingSchema);

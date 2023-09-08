@@ -44,8 +44,6 @@ client.giveawayConfig = require("./config.js");
 client.on('ready', (client) => {
   setInterval(() => {
     let status = [
-      { name: '1', type: ActivityType.Watching },
-      { name: '2', type: ActivityType.Playing },
       { name: `${client.guilds.cache.reduce((a, b) => a + b.memberCount, 0)} people 👀`, type: ActivityType.Watching },
       { name: `Bot by 121afaswpos`, type: ActivityType.Watching },
       {name: `${client.guilds.cache.size} servers!🤗`, type: ActivityType.Watching },
