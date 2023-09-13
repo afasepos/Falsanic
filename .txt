@@ -1,1 +1,1 @@
-need to test commands avatar and setup-logs and obtain a new token
+need to test commands avatar, setup-logs, hack, server-badges and obtain a new token
