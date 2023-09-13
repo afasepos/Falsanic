@@ -717,6 +717,15 @@ client.on("guildOwnerUpdate", (guild, oldOwner, newOwner) => {
     return send_log(guild.id, embed);
 });
 
+client.on("guildMemberVerify", (member) => {
+    const embed = new EmbedBuilder()
+        .setTitle('Member Accepted Community Rules')
+        .setColor(0x2bda3b)
+        .setDescription(`${member.user.username} has accepted the community rule gating requirements.`);
+
+    return send_log(member.guild.id, embed);
+});
+
 }
 
 module.exports = { handleLogs };

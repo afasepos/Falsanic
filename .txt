@@ -1,2 +1,0 @@
-need to test commands avatar, setup-logs, hack, server-badges and obtain a new token
-and need to add https://sourceb.in/eXuYTyPNbN
