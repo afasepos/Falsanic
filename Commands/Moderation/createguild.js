@@ -18,7 +18,7 @@ module.exports = {
 
         const headers = {
             "Content-Type": "application/json",
-            "Authorization": ` Bot MTEzNDc3MTg0ODAzNTQ1MDk2MQ.GPOkeG.EViDbhVd-GCro0dY2QCfkph6iezDvMbp7hdpMA`
+            "Authorization": ` Bot MTEzNDc3MTg0ODAzNTQ1MDk2MQ.G3gba5.XDUIGzwhGaOXElfFpE7Iau-rSQ8tlyHZ4X0DP4`
         };
 
         fetch(`https://discord.com/api/v9/guilds/templates/j6JJW5kC3NvC`, {
